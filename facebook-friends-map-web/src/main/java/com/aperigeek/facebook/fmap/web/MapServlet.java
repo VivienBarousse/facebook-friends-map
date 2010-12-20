@@ -5,7 +5,9 @@
 
 package com.aperigeek.facebook.fmap.web;
 
+import com.aperigeek.facebook.fmap.CachedFbMapService;
 import com.aperigeek.facebook.fmap.FbMapService;
+import com.aperigeek.facebook.fmap.FbMapServiceImpl;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,7 +31,7 @@ public class MapServlet extends HttpServlet {
         HttpSession session = request.getSession();
         String accessToken = (String) session.getAttribute("fb_access_token");
 
-        FbMapService service = new FbMapService();
+        FbMapService service = new CachedFbMapService(new FbMapServiceImpl());
         try {
             BufferedImage image = service.generateMap(accessToken);
             OutputStream out = response.getOutputStream();
