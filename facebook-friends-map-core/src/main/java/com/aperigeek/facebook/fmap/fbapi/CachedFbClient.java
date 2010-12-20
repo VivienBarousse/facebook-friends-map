@@ -29,6 +29,10 @@ public class CachedFbClient implements FbClient {
         this.wrapped = wrapped;
     }
 
+    public long getUserId() throws FbException {
+        return wrapped.getUserId();
+    }
+
     public FbLocation getCurrentLocation() throws FbException {
         return wrapped.getCurrentLocation();
     }

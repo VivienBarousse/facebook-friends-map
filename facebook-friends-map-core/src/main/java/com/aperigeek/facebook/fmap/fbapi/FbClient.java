@@ -12,6 +12,8 @@ import java.util.List;
  */
 public interface FbClient {
 
+    public long getUserId() throws FbException;
+
     public FbLocation getCurrentLocation() throws FbException;
 
     public List<FbFriend> getFriends() throws FbException;

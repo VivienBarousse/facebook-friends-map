@@ -31,6 +31,29 @@ public class FbClientImpl implements FbClient {
         this.accessToken = accessToken;
     }
 
+    public long getUserId() throws FbException {
+        try {
+            String fburl = "https://graph.facebook.com/me?access_token="
+                    + URLEncoder.encode(accessToken, FB_CHARSET);
+
+            URL url = new URL(fburl);
+
+            InputStream urlIn = url.openStream();
+            InputStreamReader reader = new InputStreamReader(urlIn);
+
+            JSONTokener tokener = new JSONTokener(reader);
+            JSONObject me = (JSONObject) tokener.nextValue();
+
+            urlIn.close();
+
+            return me.getLong("id");
+        } catch (IOException ex) {
+            throw new FbException("Unsupported I/O error", ex);
+        } catch (JSONException ex) {
+            throw new FbException("API error: invlaid JSON", ex);
+        }
+    }
+
     public FbLocation getCurrentLocation() throws FbException {
         try {
             String fburl = "https://graph.facebook.com/me?access_token="
