@@ -36,6 +36,8 @@ public class CachedFbMapService implements FbMapService {
 
     private FbMapService wrapped;
 
+    public static final long CACHE_TIMEOUT = 1 * 24 * 60 * 60 * 1000L; // 1 day
+
     public CachedFbMapService(FbMapService wrapped) {
         this.wrapped = wrapped;
     }
@@ -54,11 +56,17 @@ public class CachedFbMapService implements FbMapService {
 
         File cachedMap = new File(fbmapsCache, userId + ".png");
         if (cachedMap.exists()) {
-            try {
-                BufferedImage image = ImageIO.read(cachedMap);
-                return image;
-            } catch (IOException ex) {
-                // Unable to read map, generating again...
+
+            long cacheTime = cachedMap.lastModified();
+            long now = System.currentTimeMillis();
+
+            if (now - cacheTime < CACHE_TIMEOUT) {
+                try {
+                    BufferedImage image = ImageIO.read(cachedMap);
+                    return image;
+                } catch (IOException ex) {
+                    // Unable to read map, generating again...
+                }
             }
         }
 
