@@ -32,6 +32,8 @@ import java.util.Collection;
  */
 public class ImagePlotter {
 
+    private BoundingBox boundingBox = new BoundingBox(85, -85, 180, -180);
+
     public BufferedImage plot(int width, int height, GeoLocation center, Collection<GeoLocation> points,
             Image background) {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -131,13 +133,27 @@ public class ImagePlotter {
     }
 
     protected int toX(GeoLocation l, int width) {
-        int x = (int) ((l.getLongitude() + 180) * width / 360);
-        return x;
+        double x = (l.getLongitude() + 180);
+        return (int) (x * width / (boundingBox.getEast() - boundingBox.getWest()));
     }
 
     protected int toY(GeoLocation l, int height) {
-        int y = (int) ((1 - (Math.log(Math.tan(Math.toRadians(l.getLatitude())) + 1.0 / Math.cos(Math.toRadians(l.getLatitude()))) / Math.PI)) / 2 * height);
-        return y;
+        double y = mercator(l.getLatitude());
+        double n = mercator(boundingBox.getNorth());
+        double s = mercator(boundingBox.getSouth());
+        return (int) (((y - n) / (s - n) * 2) / 2 * height);
+    }
+
+    protected double mercator(double lat) {
+        return (1 - (Math.log(Math.tan(Math.toRadians(lat)) + 1.0 / Math.cos(Math.toRadians(lat))) / Math.PI));
+    }
+
+    public BoundingBox getBoundingBox() {
+        return boundingBox;
+    }
+
+    public void setBoundingBox(BoundingBox boundingBox) {
+        this.boundingBox = boundingBox;
     }
 
 }
