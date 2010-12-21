@@ -49,7 +49,7 @@ public class ImagePlotter {
         return image;
     }
 
-    public void drawGreatCircle(Graphics g, GeoLocation l1, GeoLocation l2, int width, int height) {
+    protected void drawGreatCircle(Graphics g, GeoLocation l1, GeoLocation l2, int width, int height) {
         double distance = distance(l1, l2);
         int steps = (int) (distance / 150); // One point every 150 kms
         double bearing = bearing(l1, l2);
@@ -57,10 +57,10 @@ public class ImagePlotter {
         GeoLocation lastPoint = l1;
         for (int i = 1; i < steps; i++) {
             GeoLocation next = pointFromBearingAndDistance(l1, bearing, stepDist * i);
-            int x1 = getX(lastPoint, width),
-                    x2 = getX(next, width),
-                    y1 = getY(lastPoint, height),
-                    y2 = getY(next, height);
+            int x1 = toX(lastPoint, width),
+                    x2 = toX(next, width),
+                    y1 = toY(lastPoint, height),
+                    y2 = toY(next, height);
             if (Math.abs(x1 - x2) > width / 2) {
                 if (x1 < x2) {
                     g.drawLine(x1, y1, x2 - width, y2);
@@ -70,16 +70,16 @@ public class ImagePlotter {
                     g.drawLine(x1 - width, y1, x2, y2);
                 }
             } else {
-                g.drawLine(getX(lastPoint, width), getY(lastPoint, height),
-                        getX(next, width), getY(next, height));
+                g.drawLine(toX(lastPoint, width), toY(lastPoint, height),
+                        toX(next, width), toY(next, height));
             }
             lastPoint = next;
         }
-        g.drawLine(getX(lastPoint, width), getY(lastPoint, height),
-                getX(l2, width), getY(l2, height));
+        g.drawLine(toX(lastPoint, width), toY(lastPoint, height),
+                toX(l2, width), toY(l2, height));
     }
 
-    public GeoLocation pointFromBearingAndDistance(GeoLocation l1, double bearing, double d) {
+    protected GeoLocation pointFromBearingAndDistance(GeoLocation l1, double bearing, double d) {
         double r = 6371; // km
 
         double dist = d / r;
@@ -97,7 +97,7 @@ public class ImagePlotter {
         return new GeoLocation(Math.toDegrees(lat2), Math.toDegrees(lon2));
     }
 
-    public double distance(GeoLocation l1, GeoLocation l2) {
+    protected double distance(GeoLocation l1, GeoLocation l2) {
         double r = 6371; // km
 
         double lat1 = Math.toRadians(l1.getLatitude());
@@ -117,7 +117,7 @@ public class ImagePlotter {
         return d;
     }
 
-    public double bearing(GeoLocation l1, GeoLocation l2) {
+    protected double bearing(GeoLocation l1, GeoLocation l2) {
         double dLon = Math.toRadians(l2.getLongitude() - l1.getLongitude());
         double lat1 = Math.toRadians(l1.getLatitude());
         double lat2 = Math.toRadians(l2.getLatitude());
@@ -130,12 +130,12 @@ public class ImagePlotter {
         return (brng + 360) % 360;
     }
 
-    public int getX(GeoLocation l, int width) {
+    protected int toX(GeoLocation l, int width) {
         int x = (int) ((l.getLongitude() + 180) * width / 360);
         return x;
     }
 
-    public int getY(GeoLocation l, int height) {
+    protected int toY(GeoLocation l, int height) {
         int y = (int) ((1 - (Math.log(Math.tan(Math.toRadians(l.getLatitude())) + 1.0 / Math.cos(Math.toRadians(l.getLatitude()))) / Math.PI)) / 2 * height);
         return y;
     }
