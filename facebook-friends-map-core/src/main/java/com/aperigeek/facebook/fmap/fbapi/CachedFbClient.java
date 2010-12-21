@@ -23,6 +23,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -55,19 +57,21 @@ public class CachedFbClient implements FbClient {
     }
 
     public FbLocation getFriendLocation(FbFriend friend) throws FbException {
-        FbLocation location = getFromCache(friend);
-        if (location == null) {
+        FbLocation location;
+        try {
+            location = getFromCache(friend);
+        } catch (NotInCacheException ex) {
             location = wrapped.getFriendLocation(friend);
             storeInCache(friend, location);
         }
         return location;
     }
 
-    public FbLocation getFromCache(FbFriend friend) {
+    public FbLocation getFromCache(FbFriend friend) throws NotInCacheException {
         try {
             File file = new File(rootFolder, Long.toString(friend.getId()));
             if (!file.exists()) {
-                return null;
+                throw new NotInCacheException();
             }
             FileReader in = new FileReader(file);
             BufferedReader reader = new BufferedReader(in);
@@ -80,7 +84,7 @@ public class CachedFbClient implements FbClient {
 
             return new FbLocation(Long.parseLong(id), name);
         } catch (IOException ex) {
-            return null; // Unable to read from cache, continue
+            throw new NotInCacheException();
         }
     }
 
@@ -101,6 +105,10 @@ public class CachedFbClient implements FbClient {
         } catch (IOException ex) {
             throw new FbException("Unable to write to cache", ex);
         }
+    }
+
+    protected static class NotInCacheException extends Exception {
+        
     }
 
 }
