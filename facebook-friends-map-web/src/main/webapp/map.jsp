@@ -11,11 +11,16 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Facebook friends mapper</title>
     </head>
     <body>
-        <h1>Hello World!</h1>
-        Please wait while your map is being generated. This might take a while.
-        <img src="map.png" alt="Friends map" />
+        <h1>Here is your map!</h1>
+        <p>
+            Please wait while your map is being generated. This might take a while.
+        </p>
+        <p style="text-align: center;">
+            <a href="map.png"><img src="map.png" alt="Friends map" style="width: 512px;" /></a><br />
+            Click on the picture for larger.
+        </p>
     </body>
 </html>
