@@ -23,14 +23,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author Vivien Barousse
  */
 public class CachedFbClient implements FbClient {
+
+    public static final long CACHE_TIMEOUT = 7 * 24 * 60 * 60 * 1000L; // 7 days
 
     private File rootFolder;
 
@@ -73,6 +73,14 @@ public class CachedFbClient implements FbClient {
             if (!file.exists()) {
                 throw new NotInCacheException();
             }
+
+            long cacheTime = file.lastModified();
+            long now = System.currentTimeMillis();
+
+            if (now - cacheTime > CACHE_TIMEOUT) {
+                throw new NotInCacheException();
+            }
+
             FileReader in = new FileReader(file);
             BufferedReader reader = new BufferedReader(in);
 
