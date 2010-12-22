@@ -28,10 +28,11 @@ import com.aperigeek.facebook.fmap.geo.GeoException;
 import com.aperigeek.facebook.fmap.geo.GeoLocation;
 import com.aperigeek.facebook.fmap.geo.GeocodingClient;
 import com.aperigeek.facebook.fmap.geo.osm.NominatimGeocodingClient;
+import com.aperigeek.facebook.fmap.image.BoundingBox;
 import com.aperigeek.facebook.fmap.image.ImagePlotter;
+import com.aperigeek.facebook.fmap.image.proj.LinearProjection;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
@@ -52,7 +53,7 @@ public class FbMapServiceImpl implements FbMapService {
         FbClient fb = new CachedFbClient(fbCache, rawFb);
         GeocodingClient rawMaps = new NominatimGeocodingClient();
         GeocodingClient maps = new CachedGeocodingClient(geoCache, rawMaps);
-        ImagePlotter plotter = new ImagePlotter();
+        ImagePlotter plotter = new ImagePlotter(2368, 1179, new LinearProjection(2368, 1179));
 
         List<FbFriend> friends = fb.getFriends();
         List<FbLocation> fbLocations = map(friends, new FbLocationMapper(fb));
@@ -61,12 +62,21 @@ public class FbMapServiceImpl implements FbMapService {
         FbLocation fbLocation = fb.getCurrentLocation();
         GeoLocation location = maps.geocode(fbLocation.getName());
 
-        BufferedImage image = plotter.plot(2048, 2048, location, locations, null);
+        plotter.setBoundingBox(new BoundingBox(90, -90, 180, -178.716));
+
+        BufferedImage background = null;
+        try {
+            background = ImageIO.read(this.getClass().getResourceAsStream("/maps/fb_orig_map.jpg"));
+        } catch (Exception ex) {
+            // Unable to load background, using none
+        }
+
+        BufferedImage image = plotter.plot(location, locations, background);
 
         return image;
     }
 
-    protected <O,T> List<T> map(List<O> orig, Mapper<O,T> mapper) {
+    protected <O, T> List<T> map(List<O> orig, Mapper<O, T> mapper) {
         List<T> ts = new ArrayList<T>();
         for (O o : orig) {
             T t = mapper.map(o);
@@ -77,7 +87,7 @@ public class FbMapServiceImpl implements FbMapService {
         return ts;
     }
 
-    protected static interface Mapper<O,T> {
+    protected static interface Mapper<O, T> {
 
         public T map(O o);
 
