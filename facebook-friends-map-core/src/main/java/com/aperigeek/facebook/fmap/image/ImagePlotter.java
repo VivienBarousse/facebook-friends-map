@@ -18,6 +18,7 @@
 package com.aperigeek.facebook.fmap.image;
 
 import com.aperigeek.facebook.fmap.geo.GeoLocation;
+import com.aperigeek.facebook.fmap.image.proj.MercatorProjection;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -32,9 +33,23 @@ import java.util.Collection;
  */
 public class ImagePlotter {
 
-    private BoundingBox boundingBox = new BoundingBox(85, -85, 180, -180);
+    private int width;
 
-    public BufferedImage plot(int width, int height, GeoLocation center, Collection<GeoLocation> points,
+    private int height;
+
+    private Projection projection;
+
+    public ImagePlotter(int width, int height) {
+        this(width, height, new MercatorProjection(width, height));
+    }
+
+    public ImagePlotter(int width, int height, Projection projection) {
+        this.width = width;
+        this.height = height;
+        this.projection = projection;
+    }
+
+    public BufferedImage plot(GeoLocation center, Collection<GeoLocation> points,
             Image background) {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = (Graphics2D) image.getGraphics();
@@ -44,7 +59,7 @@ public class ImagePlotter {
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         for (GeoLocation p : points) {
-            g.setColor(new Color(75, 75, 255));
+            g.setColor(new Color(255, 75, 75));
             drawGreatCircle(g, center, p, width, height);
         }
 
@@ -132,28 +147,26 @@ public class ImagePlotter {
         return (brng + 360) % 360;
     }
 
-    protected int toX(GeoLocation l, int width) {
-        double x = (l.getLongitude() + 180);
-        return (int) (x * width / (boundingBox.getEast() - boundingBox.getWest()));
+    /*
+     * TODO: Remove this useless '_' param
+     */
+    protected int toX(GeoLocation l, int _) {
+        return projection.toX(l);
     }
 
-    protected int toY(GeoLocation l, int height) {
-        double y = mercator(l.getLatitude());
-        double n = mercator(boundingBox.getNorth());
-        double s = mercator(boundingBox.getSouth());
-        return (int) (((y - n) / (s - n) * 2) / 2 * height);
-    }
-
-    protected double mercator(double lat) {
-        return (1 - (Math.log(Math.tan(Math.toRadians(lat)) + 1.0 / Math.cos(Math.toRadians(lat))) / Math.PI));
+    /*
+     * TODO: Remove this useless '_' param
+     */
+    protected int toY(GeoLocation l, int _) {
+        return projection.toY(l);
     }
 
     public BoundingBox getBoundingBox() {
-        return boundingBox;
+        return projection.getBoundingBox();
     }
 
     public void setBoundingBox(BoundingBox boundingBox) {
-        this.boundingBox = boundingBox;
+        projection.setBoundingBox(boundingBox);
     }
 
 }
