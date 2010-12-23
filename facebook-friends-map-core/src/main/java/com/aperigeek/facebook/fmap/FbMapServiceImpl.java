@@ -62,7 +62,7 @@ public class FbMapServiceImpl implements FbMapService {
         FbLocation fbLocation = fb.getCurrentLocation();
         GeoLocation location = maps.geocode(fbLocation.getName());
 
-        plotter.setBoundingBox(new BoundingBox(90, -90, 180, -178.716));
+        plotter.setBoundingBox(new BoundingBox(89.89, -89.28, 180.49, -178.29));
 
         BufferedImage background = null;
         try {
