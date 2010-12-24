@@ -58,7 +58,7 @@ public class LoginServlet extends HttpServlet {
         String fburl = "https://graph.facebook.com/oauth/authorize";
         fburl += "?client_id=" + clientId;
         fburl += "&redirect_uri=" + URLEncoder.encode(getServerUrl(request) + "login_callback", "UTF-8");
-        fburl += "&scope=friends_location";
+        fburl += "&scope=user_location,friends_location";
         response.sendRedirect(fburl);
     }
 
