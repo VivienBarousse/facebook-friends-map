@@ -29,7 +29,7 @@ import com.aperigeek.facebook.fmap.geo.GeoLocation;
 import com.aperigeek.facebook.fmap.geo.GeocodingClient;
 import com.aperigeek.facebook.fmap.geo.osm.NominatimGeocodingClient;
 import com.aperigeek.facebook.fmap.image.BoundingBox;
-import com.aperigeek.facebook.fmap.image.ImagePlotter;
+import com.aperigeek.facebook.fmap.image.CenteredImagePlotter;
 import com.aperigeek.facebook.fmap.image.proj.LinearProjection;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -53,7 +53,7 @@ public class FbMapServiceImpl implements FbMapService {
         FbClient fb = new CachedFbClient(fbCache, rawFb);
         GeocodingClient rawMaps = new NominatimGeocodingClient();
         GeocodingClient maps = new CachedGeocodingClient(geoCache, rawMaps);
-        ImagePlotter plotter = new ImagePlotter(2368, 1179, new LinearProjection(2368, 1179));
+        CenteredImagePlotter plotter = new CenteredImagePlotter(new LinearProjection(2368, 1179));
 
         List<FbFriend> friends = fb.getFriends();
         List<FbLocation> fbLocations = map(friends, new FbLocationMapper(fb));
