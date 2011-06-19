@@ -18,8 +18,8 @@
 package com.aperigeek.facebook.fmap.geo.osm;
 
 import com.aperigeek.facebook.fmap.geo.GeoException;
-import com.aperigeek.facebook.fmap.geo.GeoLocation;
 import com.aperigeek.facebook.fmap.geo.GeocodingClient;
+import com.aperigeek.geo.GeoLocation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;

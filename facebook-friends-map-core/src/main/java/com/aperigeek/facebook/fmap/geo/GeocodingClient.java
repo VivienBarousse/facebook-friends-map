@@ -17,6 +17,8 @@
 
 package com.aperigeek.facebook.fmap.geo;
 
+import com.aperigeek.geo.GeoLocation;
+
 /**
  *
  * @author Vivien Barousse

@@ -17,6 +17,7 @@
 
 package com.aperigeek.facebook.fmap.geo;
 
+import com.aperigeek.geo.GeoLocation;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
