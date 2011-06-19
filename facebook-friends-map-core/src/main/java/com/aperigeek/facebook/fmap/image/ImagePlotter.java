@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.aperigeek.facebook.fmap.image;
 
 import com.aperigeek.facebook.fmap.geo.GeoLocation;
@@ -25,7 +24,9 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  *
@@ -33,6 +34,18 @@ import java.util.Collection;
  */
 public class ImagePlotter {
 
+    protected static class Line {
+
+        private GeoLocation source;
+        
+        private GeoLocation dest;
+
+        public Line(GeoLocation source, GeoLocation dest) {
+            this.source = source;
+            this.dest = dest;
+        }
+        
+    }
     private Projection projection;
 
     public ImagePlotter(int width, int height) {
@@ -45,8 +58,20 @@ public class ImagePlotter {
 
     public BufferedImage plot(GeoLocation center, Collection<GeoLocation> points,
             Image background) {
-        BufferedImage image = new BufferedImage(projection.getWidth(), 
-                projection.getHeight(), 
+        
+        List<Line> lines = new ArrayList<Line>();
+        
+        for (GeoLocation p : points) {
+            lines.add(new Line(center, p));
+        }
+        
+        return plot(lines, background);
+        
+    }
+    
+    protected BufferedImage plot(Collection<Line> lines, Image background) {
+        BufferedImage image = new BufferedImage(projection.getWidth(),
+                projection.getHeight(),
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = (Graphics2D) image.getGraphics();
 
@@ -54,9 +79,11 @@ public class ImagePlotter {
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        for (GeoLocation p : points) {
+        for (Line l : lines) {
             g.setColor(new Color(255, 75, 75));
-            drawGreatCircle(g, center, p, projection.getWidth(), projection.getHeight());
+            drawGreatCircle(g, 
+                    l.source, l.dest, 
+                    projection.getWidth(), projection.getHeight());
         }
 
         return image;
@@ -158,5 +185,4 @@ public class ImagePlotter {
     public void setBoundingBox(BoundingBox boundingBox) {
         projection.setBoundingBox(boundingBox);
     }
-
 }
