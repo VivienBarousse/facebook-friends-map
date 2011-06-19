@@ -33,25 +33,21 @@ import java.util.Collection;
  */
 public class ImagePlotter {
 
-    private int width;
-
-    private int height;
-
     private Projection projection;
 
     public ImagePlotter(int width, int height) {
-        this(width, height, new MercatorProjection(width, height));
+        this(new MercatorProjection(width, height));
     }
 
-    public ImagePlotter(int width, int height, Projection projection) {
-        this.width = width;
-        this.height = height;
+    public ImagePlotter(Projection projection) {
         this.projection = projection;
     }
 
     public BufferedImage plot(GeoLocation center, Collection<GeoLocation> points,
             Image background) {
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        BufferedImage image = new BufferedImage(projection.getWidth(), 
+                projection.getHeight(), 
+                BufferedImage.TYPE_INT_RGB);
         Graphics2D g = (Graphics2D) image.getGraphics();
 
         g.drawImage(background, 0, 0, null);
@@ -60,7 +56,7 @@ public class ImagePlotter {
 
         for (GeoLocation p : points) {
             g.setColor(new Color(255, 75, 75));
-            drawGreatCircle(g, center, p, width, height);
+            drawGreatCircle(g, center, p, projection.getWidth(), projection.getHeight());
         }
 
         return image;
@@ -74,10 +70,10 @@ public class ImagePlotter {
         GeoLocation lastPoint = l1;
         for (int i = 1; i < steps; i++) {
             GeoLocation next = pointFromBearingAndDistance(l1, bearing, stepDist * i);
-            int x1 = toX(lastPoint, width),
-                    x2 = toX(next, width),
-                    y1 = toY(lastPoint, height),
-                    y2 = toY(next, height);
+            int x1 = toX(lastPoint),
+                    x2 = toX(next),
+                    y1 = toY(lastPoint),
+                    y2 = toY(next);
             if (Math.abs(x1 - x2) > width / 2) {
                 if (x1 < x2) {
                     g.drawLine(x1, y1, x2 - width, y2);
@@ -87,13 +83,13 @@ public class ImagePlotter {
                     g.drawLine(x1 - width, y1, x2, y2);
                 }
             } else {
-                g.drawLine(toX(lastPoint, width), toY(lastPoint, height),
-                        toX(next, width), toY(next, height));
+                g.drawLine(toX(lastPoint), toY(lastPoint),
+                        toX(next), toY(next));
             }
             lastPoint = next;
         }
-        g.drawLine(toX(lastPoint, width), toY(lastPoint, height),
-                toX(l2, width), toY(l2, height));
+        g.drawLine(toX(lastPoint), toY(lastPoint),
+                toX(l2), toY(l2));
     }
 
     protected GeoLocation pointFromBearingAndDistance(GeoLocation l1, double bearing, double d) {
@@ -147,17 +143,11 @@ public class ImagePlotter {
         return (brng + 360) % 360;
     }
 
-    /*
-     * TODO: Remove this useless '_' param
-     */
-    protected int toX(GeoLocation l, int _) {
+    protected int toX(GeoLocation l) {
         return projection.toX(l);
     }
 
-    /*
-     * TODO: Remove this useless '_' param
-     */
-    protected int toY(GeoLocation l, int _) {
+    protected int toY(GeoLocation l) {
         return projection.toY(l);
     }
 
