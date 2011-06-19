@@ -24,15 +24,13 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  *
  * @author Vivien Barousse
  */
-public class ImagePlotter {
+public abstract class ImagePlotter {
 
     protected static class Line {
 
@@ -54,19 +52,6 @@ public class ImagePlotter {
 
     public ImagePlotter(Projection projection) {
         this.projection = projection;
-    }
-
-    public BufferedImage plot(GeoLocation center, Collection<GeoLocation> points,
-            Image background) {
-        
-        List<Line> lines = new ArrayList<Line>();
-        
-        for (GeoLocation p : points) {
-            lines.add(new Line(center, p));
-        }
-        
-        return plot(lines, background);
-        
     }
     
     protected BufferedImage plot(Collection<Line> lines, Image background) {
